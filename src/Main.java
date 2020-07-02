@@ -1,6 +1,4 @@
 import com.alibaba.fastjson.JSONArray;
-import models.vo.MakeCCCExistenceProof;
-import models.vo.RpcMakeVccProof;
 import models.vo.Transaction;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Function;

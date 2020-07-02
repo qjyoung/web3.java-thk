@@ -1,19 +1,21 @@
 package web3;
 
-import java.awt.*;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import models.Account;
 import models.TransactionByHash;
-import models.vo.MakeCCCExistenceProof;
-import models.vo.RpcMakeVccProof;
 import models.vo.Transaction;
+import models.vo.VccProof;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by thk on 6/15/19.
@@ -273,48 +275,33 @@ public class Thk {
         Map maps = (Map) JSON.parse(result);
         return maps;
     }
-
-    //生成取消支票的证明
-    public Map  MakeCCCExistenceProof(MakeCCCExistenceProof info){
+    
+    /**
+     * 获取兑现或者撤销支票的证明
+     *
+     * @param proof        获取证明必要参数，注意撤销时toChain传发起链id，与生成支票相反
+     * @param cashOrCancel true兑现，false撤销
+     */
+    //生成兑现支票的证明
+    public Map RpcMakeVccProof(VccProof proof, boolean cashOrCancel) {
         //举例参数
-        Map map=new HashMap();
-        map.put("chainId",info.getChainId());
-        map.put("from",info.getFrom());
-        map.put("to",info.getTo());
-        map.put("fromChainId",info.getFromChainId());
-        map.put("toChainId",info.getToChainId());
-        map.put("value",info.getValue());
-        map.put("nonce",info.getNonce());
-        map.put("expireheight",info.getExpireheight());
-
+        Map<String, Object> map = new HashMap<>();
+        map.put("chainId", proof.getChainId() + "");
+        map.put("from", proof.getFromAddress());
+        map.put("to", proof.getToAddress());
+        map.put("fromChainId", proof.getFromChain() + "");
+        map.put("toChainId", proof.getToChain() + "");
+        map.put("value", proof.getAmount().toString());
+        map.put("nonce", proof.getNonce() + "");
+        map.put("expireheight", proof.getExpireHeight() + "");
+        
+        String method = cashOrCancel ? "RpcMakeVccProof" : "MakeCCCExistenceProof";
         String jsonObj = JSONObject.toJSONString(map);
-        String postJson="{\"method\": \"MakeCCCExistenceProof\",\"params\": "+jsonObj+"}";
-        String result=Post(Url,postJson);
-        Map maps = (Map) JSON.parse(result);
-        return maps;
+        String postJson = "{\"method\": \"" + method + "\",\"params\": " + jsonObj + "}";
+        String result = Post(Url, postJson);
+        return (Map) JSON.parse(result);
     }
-
-
-    //生成支票的证明
-    public Map   RpcMakeVccProoff(RpcMakeVccProof info){
-        //举例参数
-        Map map=new HashMap();
-        map.put("chainId",info.getChainId());
-        map.put("from",info.getFrom());
-        map.put("to",info.getTo());
-        map.put("fromChainId",info.getFromChainId());
-        map.put("toChainId",info.getToChainId());
-        map.put("value",info.getValue());
-        map.put("nonce",info.getNonce());
-        map.put("expireheight",info.getExpireheight());
-
-        String jsonObj = JSONObject.toJSONString(map);
-        String postJson="{\"method\": \"RpcMakeVccProof\",\"params\": "+jsonObj+"}";
-        String result=Post(Url,postJson);
-        Map maps = (Map) JSON.parse(result);
-        return maps;
-    }
-
+    
     //获取节点运行信息
     public Map   Ping(String address){
         //举例参数
@@ -327,8 +314,6 @@ public class Thk {
         return maps;
     }
 
-
-
     /**
      * 发送HttpPost请求
      *
@@ -339,8 +324,8 @@ public class Thk {
      * @return 成功:返回json字符串<br/>
      */
     private static String Post(String strURL, String params) {
-        System.out.println("server:\n"+strURL);
-        System.out.println("params:\n"+params+"\n");
+//        log("server", strURL);
+        System.err.println("params: " + params);
         BufferedReader reader = null;
         try {
             URL url = new URL(strURL);// 创建连接
@@ -392,9 +377,14 @@ public class Thk {
         }
         return "error"; // 自定义错误信息
     }
-
-
-
-
-
+    
+    
+    public static void log(String label, Object value) {
+        System.out.println(label + ": " + value);
+    }
+    
+    public static void log(String label) {
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " + label + " ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    }
+    
 }

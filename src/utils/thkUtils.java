@@ -27,7 +27,7 @@ public class thkUtils {
      */
     public static String GetPublicKey() {
         ECKeyPair keyPair = null;
-        System.out.println(Numeric.hexStringToByteArray(privateKey).toString());
+//        System.out.println(Numeric.hexStringToByteArray(privateKey).toString());
         try {
             keyPair = ECKeyPair.create(Numeric.hexStringToByteArray(privateKey));
         } catch (Exception ex) {
@@ -86,7 +86,7 @@ public class thkUtils {
         int recId = -1;
         for (int i = 0; i < 4; i++) {
             BigInteger k = recoverFromSignature(i, sig, messageHash);
-            System.out.println("k.index: "+i+ " "+ k);
+//            System.out.println("k.index: "+i+ " "+ k);
             if (k != null && k.equals(keyPair.getPublicKey())) {
                 recId = i;
                 break;
@@ -165,7 +165,7 @@ public class thkUtils {
         int recId = -1;
         for (int i = 0; i < 4; i++) {
             BigInteger k = recoverFromSignature(i, sig, messageHash);
-            System.out.println("k.index: "+i+ " "+ k);
+//            System.out.println("k.index: "+i+ " "+ k);
             if (k != null && k.equals(keyPair.getPublicKey())) {
                 recId = i;
                 break;

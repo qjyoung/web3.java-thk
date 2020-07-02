@@ -1,0 +1,8 @@
+*~
+.DS_Store
+out/
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
